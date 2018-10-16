@@ -1,0 +1,62 @@
+<!--{subtemplate orange_secret:header}-->
+	<body>
+		<div class="page_main">
+			<div class="doc_main">
+				<div class="secret_button">
+					<div class="icon"></div>
+					<div class="text">{$orange_conf['item_button']}</div>
+					<a href="plugin.php?id=orange_secret:publish" class="open_page"></a>
+				</div>
+				<ul class="secret_list">
+					<!--{loop $page_list $list}-->
+					<li>
+						<div class="secret_head b{$list['hid']}"></div>
+						<div class="secret_main <!--{if $list['is_head']}-->head_active<!--{/if}-->" style="background:{$list['theme_color']};">
+							<div class="secret_cont">{$list['content']}</div>
+							<a href="plugin.php?id=orange_secret:detail&lid=$list['id']" class="open_page"></a>
+							<div class="is_head"></div>
+						</div>
+						<div class="secret_foot">
+							<div class="foot_left"><div>{$lang['h_praise']}<span class="praise_num">{$list['praise_num']}</span></div><div>{$lang['h_comment']}{$list['comment_num']}</div></div>
+							<div class="foot_right" data-id="{$list['id']}">
+								<div class="praise <!--{if $praise_list[$list['id']]}-->active<!--{/if}-->"></div>
+								<div class="comment"></div>
+								<!--{if $is_manage}--><div class="manage"></div><!--{/if}-->
+							</div>
+							<!--{if $is_manage}-->
+							<ul class="handle_list" data-id="{$list['id']}">
+								<!--{if !$list['is_head']}-->
+								<li class="stick top" data-act="secret" data-type="top"></li>
+								<!--{else}-->
+								<li class="stick bottom" data-act="secret" data-type="bottom"></li>
+								<!--{/if}-->
+								<li class="delete" data-act="secret" data-type="delete"></li>
+							</ul>
+							<!--{/if}-->
+						</div>
+					</li>
+					<!--{/loop}-->
+				</ul>
+			</div>
+			<div class="loading"><div class="loading_main"></div></div>
+		</div>
+		<ul class="button-list">
+			<li data-type="packup"></li>
+			<li data-type="publish"></li>
+			<li data-type="refresh"></li>
+			<li data-type="stealth"></li>
+		</ul>
+		<script type="text/javascript">
+			var page_count = {$page_count};
+			<!--{subtemplate orange_secret:manage}-->
+			load_data('.secret_list',page_count,{},'plugin.php?id=orange_secret&act=ajax_secret',{body_main:'.doc_main',doc_main:'.page_main'},
+			function (){
+				$('.loading').css({display:'-webkit-box'});
+            	$('.loading_main').css({WebkitAnimation:'loading 1s infinite linear'});
+			},
+			function (){
+				$('.loading').css({display:'none'});
+			});
+		</script>
+	</body>
+</html>

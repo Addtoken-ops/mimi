@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="blank" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="full-screen" content="yes">
+		<meta name="x5-fullscreen" content="true">
+		<title>{$orange_conf['site_name']}</title>
+		<style>
+			html,body{height: 100%;overflow:hidden;margin: 0;}
+			.head{
+				height: 70%;
+				background: url(source/plugin/orange_secret/static/images/app_head_bg.jpg) no-repeat center/cover;
+			}
+			.foot{
+				height: 30%;
+				background: url(source/plugin/orange_secret/static/images/app_foot_bg.jpg) no-repeat center/cover;
+			}
+			.cont{
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				position: absolute;
+				text-align: center;
+			}
+			.cont img{
+				width: 200px;
+				margin: 12% 0 20px;
+				border-radius: 3px;
+				box-shadow: 0 0 20px rgba(0,0,0,0.05);
+			}
+			.text{
+				color: #333;
+				font-size: 16px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="head"></div>
+		<div class="foot"></div>
+		<div class="cont">
+			<img src="source/plugin/orange_secret/static/images/code.png" />
+			<div class="text">{lang orange_secret:pc_intro}</div>
+		</div>
+	</body>
+</html>

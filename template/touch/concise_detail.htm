@@ -1,0 +1,159 @@
+<!--{subtemplate orange_secret:header}-->
+	<body>
+		<div class="page_main detail_main">
+			<div class="doc_main pb50">
+				<ul class="secret_first">
+					<li>
+						<div class="user_cont">
+							<!--{if 0 && !$secret['is_hide']}-->
+							<div class="user_auth" data-uid="{$secret['uid']}" >
+								<img src="{$_G['setting']['ucenterurl']}/avatar.php?uid={$secret['uid']}&size=small" />
+							</div>
+							<!--{else}-->
+							<div class="user_auth"></div>
+							<!--{/if}-->
+							<div class="user_intro">
+								<div class="user_name"><!--{if 1 || $secret['is_hide']}-->{$lang['h_hide_user']}<!--{else}-->{$secret['username']}<!--{/if}--></div>
+								<div class="address"><div class="icon"></div><div class="text">{$secret['address']}</div></div>
+							</div>
+							<!--{if $secret['is_head']}-->
+							<div class="is_head"></div>
+							<!--{/if}-->
+						</div>
+						<div class="secret_main">
+							<div class="secret_cont"><span>{$secret['tag_name']}</span>{$secret['content']}</div>
+							<div class="region_intro">
+								<div class="handle" data-id="{$secret['id']}">
+									<div class="praise <!--{if $is_praise}-->active<!--{/if}-->"><div class="icon"></div><div class="text">{$secret['praise_num']}</div></div>
+									<div class="comment"><div class="icon"></div><div class="text">{$secret['comment_num']}</div></div>
+									<!--{if $is_manage}--><div class="manage"><div class="icon"></div></div><!--{/if}-->
+								</div>
+								<!--{if $is_manage}-->
+								<ul class="handle_list" data-id="{$secret['id']}" style="left:0;bottom:0;right:initial;">
+									<!--{if !$secret['is_head']}-->
+									<li class="stick top" data-act="secret" data-type="top"></li>
+									<!--{else}-->
+									<li class="stick bottom" data-act="secret" data-type="bottom"></li>
+									<!--{/if}-->
+									<li class="delete" data-act="secret" data-type="delete"></li>
+								</ul>
+								<!--{/if}-->
+								<div class="addtime">{echo dgmdate($secret['add_time'], 'u', '9999', getglobal('setting/dateformat'));}</div>
+							</div>
+						</div>
+					</li>
+				</ul>
+				<ul class="comment_list">
+					<!--{loop $comment_list $comment}-->
+					<li>
+						<div class="comment_logo">
+							<!--{if 0 && $comment['uid'] && $comment['uid'] != $secret['uid']}-->
+							<img src="{$_G['setting']['ucenterurl']}/avatar.php?uid={$comment['uid']}&size=small" />
+							<!--{/if}-->
+						</div>
+						<div class="comment_main">
+							<!--{if $comment['uid'] == $secret['uid']}-->
+							<div class="user_name active">{$lang['h_hide_louzhu']}</div>						
+							<!--{elseif 0 && $comment['username']}-->
+							<div class="user_name">{$comment['username']}</div>
+							<!--{else}-->
+							<div class="user_name">{$lang['h_hide_user']}</div>
+							<!--{/if}-->
+							<div class="comment_cont <!--{if $comment['uid']==$uid}-->active<!--{/if}-->">{$comment['content']}</div>
+						</div>
+						<div class="comment_time">
+							<div>{echo dgmdate($comment['add_time'], 'u', '9999', getglobal('setting/dateformat'));}</div>
+							<!--{if $is_manage}-->
+							<ul class="handle_list" data-id="{$comment['id']}">
+								<li class="delete" data-act="comment" data-type="delete"></li>
+							</ul>
+							<!--{/if}-->
+						</div>
+					</li>
+					<!--{/loop}-->
+				</ul>
+				<div class="loading"><div class="loading_main"></div></div>
+			</div>
+		</div>
+		<div class="comment_foot">
+			<input type="text" class="comment_input" placeholder="{$lang['h_show_comment']}"/>
+			<input type="button" class="comment_submit" value="{$lang['h_comment_submit']}"/>
+		</div>
+		<div class="rocket">
+			<div class="rocket_main"></div>
+			<div class="rocket_bottom"></div>
+		</div>
+		<script src="source/plugin/orange_secret/static/js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			var hid = null;
+			var lid = {eval echo (int)$secret['id']};
+			var page_count = {$comment_count};
+			var comment_cont = '';
+			$('.comment_input').on('input',function (){
+				comment_cont = $.trim($(this).val());
+				if( comment_cont ){
+					$('.comment_submit').addClass('active');
+				}else{
+					$('.comment_submit').removeClass('active');
+				}
+			});
+			$('.comment_input').on('blur',function (){
+				comment_cont = $.trim($(this).val());
+				if( comment_cont ){
+					$('.comment_input').addClass('focus');
+					$('.comment_submit').css({display:'block'});
+				}else{
+					$('.comment_input').removeClass('focus');
+					$('.comment_submit').removeAttr('style');
+				}
+			});
+			$('.comment_submit').on('touchend',function (){
+				if( !comment_cont ){return;}
+				if( is_login ){
+					hid = get_rand(1,31);
+					var comment = $('.comment .text');
+					var comment_num = comment.html();
+					comment_num++;
+					comment.html(comment_num);
+					$('.comment_list').prepend(
+						'<li>'+
+							'<div class="comment_logo"><!--{if 0 && $secret['uid'] != $uid && $uid}--><img src="{$_G['setting']['ucenterurl']}/avatar.php?uid={$uid}&size=small" /><!--{/if}--></div>'+
+							'<div class="comment_main">'+
+							'<div class="user_name active"><!--{if 1 || !$uid}-->{$lang['h_hide_user']}<!--{elseif $secret['uid'] != $uid}-->{$username}<!--{elseif $secret['uid'] == $uid}-->{$lang['h_hide_louzhu']}<!--{/if}--></div>'+						
+							'<div class="comment_cont active">'+comment_cont+'</div>'+
+							'</div>'+
+							'<div class="comment_time">{$lang['h_just']}</div>'+
+						'</li>'
+					);
+					$('.comment_input').val('');
+				}else{
+					onLogin();return false;
+				}
+				$.ajax({
+					type:'post',
+					url:'plugin.php?id=orange_secret:detail&act=comment&formhash={FORMHASH}',
+					data:{
+						content:comment_cont,
+						lid:lid,
+						hid:hid
+					},
+					dataType:'json',
+					success:function ( data ){
+						if( !data.success ){
+							onLogin();
+					  	}
+					}
+				});
+			});
+			<!--{subtemplate orange_secret:manage}-->
+			load_data('.comment_list',page_count,{},'plugin.php?id=orange_secret:detail&act=ajax_comment',{body_main:'.doc_main',doc_main:'.page_main'},
+			function (){
+				$('.loading').css({display:'-webkit-box'});
+            	$('.loading_main').css({WebkitAnimation:'loading 1s infinite linear'});
+			},
+			function (){
+				$('.loading').css({display:'none'});
+			});
+		</script>
+	</body>
+</html>

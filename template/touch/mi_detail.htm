@@ -1,0 +1,151 @@
+<!--{subtemplate orange_secret:header}-->
+	<body>
+		<div class="page_main detail_main">
+			<div class="doc_main pb50">
+				<ul class="secret_list">
+					<li>
+						<div class="secret_head b{$secret['hid']}"></div>
+						<div class="secret_main" style="background:{$secret['theme_color']};">
+							<div class="secret_cont">{$secret['content']}</div>
+						</div>
+						<div class="secret_foot">
+							<div class="foot_left"><div>{$lang['h_praise']}<span class="praise_num">{$secret['praise_num']}</span></div><div>{$lang['h_comment']}<span class="comment_num">{$secret['comment_num']}</span></div></div>
+							<div class="foot_right">
+								<div class="praise <!--{if $is_praise}-->active<!--{/if}-->"></div>
+								<div class="comment"><input type="text" /></div>
+								<!--{if $is_manage}--><div class="manage"></div><!--{/if}-->
+							</div>
+							<!--{if $is_manage}-->
+							<ul class="handle_list" data-id="{$secret['id']}">
+								<!--{if !$secret['is_head']}-->
+								<li class="stick top" data-act="secret" data-type="top"></li>
+								<!--{else}-->
+								<li class="stick bottom" data-act="secret" data-type="bottom"></li>
+								<!--{/if}-->
+								<li class="delete" data-act="secret" data-type="delete"></li>
+							</ul>
+							<!--{/if}-->
+						</div>
+					</li>
+				</ul>
+				<ul class="comment_list">
+					<!--{loop $comment_list $comment}-->
+					<li>
+						<div class="comment_logo"><img src="source/plugin/orange_secret/static/images/head_portrait/{$comment['hid']}.jpg" /></div>
+						<div class="comment_main">
+							<!--{if $is_manage}-->
+							<ul class="handle_list" data-id="{$comment['id']}">
+								<li class="delete" data-act="comment" data-type="delete"></li>
+							</ul>
+							<!--{/if}-->
+							<div class="comment_time">{echo dgmdate($comment['add_time'], 'u', '9999', getglobal('setting/dateformat'));}</div>
+							<div class="comment_cont <!--{if $comment['uid']==$uid}-->active<!--{/if}-->">{$comment['content']}</div>
+						</div>
+					</li>
+					<!--{/loop}-->
+				</ul>
+				<div class="loading"><div class="loading_main"></div></div>
+			</div>
+		</div>
+		<div class="comment_foot">
+			<input type="text" class="comment_input" placeholder="{$lang['h_hide_comment']}"/>
+			<input type="button" class="comment_submit" value="{$lang['h_comment_submit']}"/>
+		</div>
+		<div class="rocket">
+			<div class="rocket_main"></div>
+			<div class="rocket_bottom"></div>
+		</div>
+		<script src="source/plugin/orange_secret/static/js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			var hid = null;
+			var lid = {eval echo (int)$secret['id']};
+			var page_count = {$comment_count};
+			var vheight = document.documentElement.clientHeight;
+			var rocket = $('.rocket');
+			$('.page_main').on('touchmove',function (){
+				if( $(this).scrollTop() > vheight ){
+					rocket.show();
+				}else{
+					rocket.hide();
+				}
+			});
+			rocket.on('touchend',function (){
+				$('.page_main').animate({'scrollTop':0},1000);
+				rocket.css({transition:'0.5s ease-in'});
+				setTimeout(function (){
+					rocket.css({transform:'translateY(0px) translate3d(0,0,0)',display:'none'});
+				},600);
+				setTimeout(function (){
+					rocket.css({transform:'translateY(-'+vheight+'px) translate3d(0,0,0)'});	
+				},1);
+			});
+			$('.comment').on('click',function (){
+				$('.comment_input').focus();
+			});
+			var comment_cont = '';
+			$('.comment_input').on('input',function (){
+				comment_cont = $.trim($(this).val());
+				if( comment_cont ){
+					$('.comment_submit').addClass('active');
+				}else{
+					$('.comment_submit').removeClass('active');
+				}
+			});
+			$('.comment_input').on('blur',function (){
+				comment_cont = $.trim($(this).val());
+				if( comment_cont ){
+					$('.comment_input').addClass('focus');
+					$('.comment_submit').css({display:'block'});
+				}else{
+					$('.comment_input').removeClass('focus');
+					$('.comment_submit').removeAttr('style');
+				}
+			});
+			$('.comment_submit').on('touchend',function (){
+				if( !comment_cont ){return;}
+				if( is_login ){
+					hid = get_rand(1,31);
+					var comment = $('.comment_num');
+					var comment_num = comment.html();
+					comment_num++;
+					comment.html(comment_num);
+					$('.comment_list').prepend(
+						'<li>'+
+							'<div class="comment_logo"><img src="source/plugin/orange_secret/static/images/head_portrait/'+hid+'.jpg"></div>'+
+							'<div class="comment_main">'+
+							'<div class="comment_time">{$lang['h_just']}</div>'+
+							'<div class="comment_cont active">'+comment_cont+'</div>'+
+							'</div>'+
+						'</li>');
+					$('.comment_input').val('');
+				}else{
+					onLogin();return false;
+				}
+				$.ajax({
+					type:'post',
+					url:'plugin.php?id=orange_secret:detail&act=comment&formhash={FORMHASH}',
+					data:{
+						content:comment_cont,
+						lid:lid,
+						hid:hid
+					},
+					dataType:'json',
+					success:function ( data ){
+						if( !data.success ){
+							onLogin();
+					  	}
+					}
+				});
+			});
+			<!--{subtemplate orange_secret:manage}-->
+			load_data('.comment_list',page_count,{},'plugin.php?id=orange_secret:detail&act=ajax_comment',{body_main:'.doc_main',doc_main:'.page_main'},
+			function (){
+				$('.loading').css({display:'-webkit-box'});
+            	$('.loading_main').css({WebkitAnimation:'loading 1s infinite linear'});
+			},
+			function (){
+				$('.loading').css({display:'none'});
+			});
+		</script>
+	</body>
+</html>

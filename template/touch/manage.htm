@@ -1,0 +1,173 @@
+var page_disY = 0;
+$(document).on('touchstart',function (){
+	page_disY = event.changedTouches[0].pageY;
+});
+
+$(document).on('touchend','.praise',function (){
+	if( page_disY != event.changedTouches[0].pageY ){ return; }
+	var praise = $(this).parents('li').find('.praise_num');
+	var is_praise = $(this).hasClass('active');
+	var praise_num = praise.html();
+	var praise_handle = '';
+	
+	if( is_praise ){
+		praise_num--;
+		praise_handle = 'cancel';
+		$(this).removeClass('active');
+	}else{
+		praise_num++;
+		praise_handle = 'confirm';
+		is_login && $(this).addClass('active');
+	}
+	if( is_login ){
+		praise.html(praise_num);
+	}else{
+		onLogin();return false;
+	}
+	
+	$.ajax({
+		type:'post',
+		url:'plugin.php?id=orange_secret&act=praise&formhash={FORMHASH}',
+		data:{
+			handle_type:praise_handle,
+			lid:$(this).parent().attr('data-id')
+		},
+		dataType:'json',
+		success:function ( data ){
+			if( !data.success ){
+				onLogin();
+		  	}
+		}
+	});
+});
+
+var vheight = document.documentElement.clientHeight;
+$(document).on('touchend','.comment',function (){
+	if( page_disY != event.changedTouches[0].pageY || !$(this).parent().attr('data-id')){ return; }
+	open_page( siteurl+'plugin.php?id=orange_secret:detail&lid='+$(this).parent().attr('data-id') );
+});
+var buttonOff = true;
+$('.button-list').on('touchend','li',function (){
+	if( page_disY != event.changedTouches[0].pageY ){ return; }
+	var type = $(this).attr('data-type');
+	if( type == 'packup' ){
+		showButton();
+		$('.page_main').animate({'scrollTop':0},500);
+	}else if( type == 'publish' ){
+		showButton();
+		open_page(siteurl + 'plugin.php?id=orange_secret:publish');
+	}else if( type == 'refresh' ){
+		showButton();
+		var loading = layer.open({
+            content:'\u6b63\u5728\u52a0\u8f7d\u002e\u002e\u002e',
+            skin: 'msg',
+        });
+        $.ajax({
+            type: 'post',
+            data: {start: 0},
+            url: 'plugin.php?id=orange_secret&act=ajax_secret',
+            success: function ( data ){
+                layer.close(loading);
+                $('.secret_list').html(data);
+                $('.page_main').animate({'scrollTop':0},500);
+            }
+        });
+	}else if( type == 'stealth' ){
+		showButton();
+	}
+})
+function showButton(){
+	var len = $('.button-list li').length;
+	var height = $('.button-list').height()+10;
+	for( var i=1; i<len; i++ ){
+		$('.button-list li').eq(i-1).css({
+			'opacity': buttonOff ? 1 : 0,
+			'transform': 'translateY(-'+( buttonOff ? i*height : 0 )+'px) rotateZ('+( buttonOff ? 360 : 0 )+'deg)'
+		});
+	}
+	buttonOff = !buttonOff;
+}
+<!--{if $is_manage}-->
+var is_manage = true;
+$(document).on('touchend','.manage',function (){
+	if( page_disY != event.changedTouches[0].pageY ){ return; }
+	var handle_list = $(this).parents('li').find('.handle_list');
+	var width = 0;
+	if( is_manage ){
+		width = 2*handle_list.find('li').eq(0).innerWidth();
+		$(handle_list).css({display:'-webkit-box'});
+	}else{
+		width = 0;
+	}
+	setTimeout(function (){
+		$(handle_list).width( width );
+	},1);
+	is_manage = !is_manage;
+});
+var lang = {
+	'delete':'{$lang['h_delete']}',
+	'top':'{$lang['h_top']}',
+	'bottom':'{$lang['h_bottom']}',
+	'delete_info':'{$lang['h_delete_info']}',
+	'top_info':'{$lang['h_top_info']}',
+	'bottom_info':'{$lang['h_bottom_info']}',
+	'notroot':'{$lang['h_notroot']}'
+};
+function delete_motion(){
+	$(this).remove();
+}
+var handle_callback = {
+	'delete':function ( handle_secret ){
+		handle_secret.bind('webkitTransitionEnd',delete_motion);
+		handle_secret.css({height:handle_secret.height()});
+		setTimeout(function (){
+			handle_secret.css({height:0,opacity:0,padding:0});
+		},100);
+	},
+	'top':function ( handle_secret ){
+		is_manage = !is_manage;
+		$(handle_secret).find('.handle_list').width(0);
+		$(handle_secret).find('.stick').addClass('bottom');
+		$(handle_secret).find('.stick').removeClass('top');
+		$(handle_secret).find('.pub_time').addClass('is_head');
+		$(handle_secret).find('.stick').attr({'data-act':'bottom'});
+		$(handle_secret).find('.secret_main').addClass('head_active');
+	},
+	'bottom':function ( handle_secret ){
+		is_manage = !is_manage;
+		$(handle_secret).find('.handle_list').width(0);
+		$(handle_secret).find('.stick').addClass('top');
+		$(handle_secret).find('.stick').removeClass('bottom');
+		$(handle_secret).find('.stick').attr({'data-act':'top'});
+		$(handle_secret).find('.pub_time').removeClass('is_head');
+		$(handle_secret).find('.secret_main').removeClass('head_active');
+	}
+}
+$(document).on('touchend','.handle_list li',function (){
+	var handle_secret = $(this).parents('li');
+	var lid = $(this).parent().attr('data-id');
+	var act = $(this).attr('data-act');
+	var type = $(this).attr('data-type');
+	if( confirm(lang[type]) ){
+    	$.ajax({
+    		type:'post',
+    		url:'plugin.php?id=orange_secret:handle&formhash={FORMHASH}&act='+act,
+    		dataType:'json',
+    		data:{lid:lid,type:type},
+    		success:function ( data ){
+    			var message = lang[type+'_info'];
+				if( !data.success ){
+					message = lang['notroot'];
+				}else{
+					handle_callback[type] && handle_callback[type](handle_secret);	
+				}
+				layer.open({
+				    content:message,
+				    skin: 'msg',
+				    time:2,
+		  		});
+    		}
+    	});
+   }
+});
+<!--{/if}-->

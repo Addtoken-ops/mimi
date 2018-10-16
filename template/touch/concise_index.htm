@@ -1,0 +1,87 @@
+<!--{subtemplate orange_secret:header}-->
+	<body>
+		<div class="page_main">
+			<div class="doc_main">
+				<div class="secret_button">
+					<div class="icon"></div>
+					<div class="text">{$orange_conf['item_button']}</div>
+					<a href="plugin.php?id=orange_secret:publish" class="open_page"></a>
+				</div>
+				<ul class="secret_list">
+					<!--{loop $page_list $list}-->
+					<li>
+						<div class="header">
+							<!--{if 0 && !$list['is_hide']}-->
+							<div class="user_auth" data-uid="{$list['uid']}" >
+								<img src="{$_G['setting']['ucenterurl']}/avatar.php?uid={$list['uid']}&size=small" />
+							</div>
+							<!--{else}-->
+							<div class="user_auth"></div>
+							<!--{/if}-->
+							<div class="user_cont">
+								<div class="user_name"><!--{if 1 || $list['is_hide']}-->{$lang['h_hide_user']}<!--{else}-->{$list['username']}<!--{/if}--></div>
+								<!--{if $list['address']}-->
+								<div class="user_loca">
+									<div class="icon"></div>
+									<div class="text">{$list['address']}</div>
+								</div>
+								<!--{/if}-->
+							</div>
+							<div class="pub_time <!--{if $list['is_head']}-->is_head<!--{/if}-->">{echo dgmdate($list['add_time'], 'u', '9999', getglobal('setting/dateformat'));}</div>
+						</div>
+						<div class="content">
+							<span>{$list['tag_name']}</span>{$list['content']}
+							<a href="plugin.php?id=orange_secret:detail&lid={$list['id']}" class="open_page"></a>
+						</div>
+						<div class="handle" data-id="{$list['id']}">
+							<div class="praise <!--{if $praise_list[$list['id']]}-->active<!--{/if}-->">
+								<div class="icon"></div>
+								<div class="text">{$list['praise_num']}</div>
+							</div>
+							<div class="comment">
+								<div class="icon"></div>
+								<div class="text">{$list['comment_num']}</div>
+							</div>
+							<!--{if $is_manage}-->
+							<div class="manage">
+								<div class="icon"></div>
+								<div class="text"></div>
+							</div>
+							<!--{/if}-->
+						</div>
+						<!--{if $is_manage}-->
+							<ul class="handle_list" data-id="{$list['id']}">
+								<!--{if !$list['is_head']}-->
+								<li class="stick top" data-act="secret" data-type="top"></li>
+								<!--{else}-->
+								<li class="stick bottom" data-act="secret" data-type="bottom"></li>
+								<!--{/if}-->
+								<li class="delete" data-act="secret" data-type="delete"></li>
+							</ul>
+						<!--{/if}-->
+					</li>
+					<!--{/loop}-->
+				</ul>
+			</div>
+			<div class="loading"><div class="loading_main"></div></div>
+		</div>
+		<ul class="button-list">
+			<li data-type="packup"></li>
+			<li data-type="publish"></li>
+			<li data-type="refresh"></li>
+			<li data-type="stealth"></li>
+		</ul>
+		<script type="text/javascript">
+			var page_count = {$page_count};
+			<!--{subtemplate orange_secret:manage}-->
+			load_data('.secret_list',page_count,{},'plugin.php?id=orange_secret&act=ajax_secret',{body_main:'.doc_main',doc_main:'.page_main'},
+			function (){
+				$('.loading').css({display:'-webkit-box'});
+            	$('.loading_main').css({WebkitAnimation:'loading 1s infinite linear'});
+			},
+			function (){
+				$('.loading').css({display:'none'});
+			});
+		</script>
+	</body>
+</html>

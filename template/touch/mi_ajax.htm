@@ -1,0 +1,45 @@
+<!--{if $act == 'ajax_secret'}-->
+	<!--{loop $page_list $list}-->
+	<li>
+		<div class="secret_head b{$list['hid']}"></div>
+		<div class="secret_main <!--{if $list['is_head']}-->head_active<!--{/if}-->" style="background:{$list['theme_color']};">
+			<div class="secret_cont">{$list['content']}</div>
+			<a href="plugin.php?id=orange_secret:detail&lid=$list['id']" class="open_page"></a>
+			<!--{if $list['is_head']}--><div class="is_head"></div><!--{/if}-->
+		</div>
+		<div class="secret_foot">
+			<div class="foot_left"><div>{$lang['h_praise']}<span class="praise_num">{$list['praise_num']}</span></div><div>{$lang['h_comment']}{$list['comment_num']}</div></div>
+			<div class="foot_right" data-id="{$list['id']}">
+				<div class="praise <!--{if $praise_list[$list['id']]}-->active<!--{/if}-->"></div>
+				<div class="comment"></div>
+				<!--{if $is_manage}--><div class="manage"></div><!--{/if}-->
+			</div>
+			<!--{if $is_manage}-->
+			<ul class="handle_list" data-id="{$list['id']}">
+				<!--{if !$list['is_head']}-->
+				<li class="stick top" data-act="secret" data-type="top"></li>
+				<!--{else}-->
+				<li class="stick bottom" data-act="secret" data-type="bottom"></li>
+				<!--{/if}-->
+				<li class="delete" data-act="secret" data-type="delete"></li>
+			</ul>
+			<!--{/if}-->
+		</div>
+	</li>
+	<!--{/loop}-->
+<!--{elseif $act == 'ajax_comment'}-->
+	<!--{loop $comment_list $comment}-->
+		<li>
+			<div class="comment_logo"><img src="source/plugin/orange_secret/static/images/head_portrait/{$comment['hid']}.jpg" /></div>
+			<div class="comment_main">
+				<!--{if $is_manage}-->
+				<ul class="handle_list" data-id="{$comment['id']}">
+					<li class="delete" data-act="comment" data-type="delete"></li>
+				</ul>
+				<!--{/if}-->
+				<div class="comment_time">{echo dgmdate($comment['add_time'], 'u', '9999', getglobal('setting/dateformat'));}</div>
+				<div class="comment_cont <!--{if $comment['uid']==$uid}-->active<!--{/if}-->">{$comment['content']}</div>
+			</div>
+		</li>
+	<!--{/loop}-->
+<!--{/if}-->

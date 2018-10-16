@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="blank" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="full-screen" content="yes">
+		<meta name="x5-fullscreen" content="true">
+		<title>{$orange_conf['site_name']}</title>
+		<link rel="stylesheet" href="source/plugin/orange_secret/static/css/{$orange_conf['item_style']}.css?23" />
+		<script src="source/plugin/orange_secret/static/js/layer_mobile/layer.js"></script>
+		<script src="source/plugin/orange_secret/static/js/jquery-2.1.3.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="source/plugin/orange_secret/static/js/sq-3.0.0.js" type="text/javascript" charset="utf-8"></script>
+		<script src="source/plugin/orange_secret/static/js/public.js?21" type="text/javascript" charset="utf-8"></script>
+		<script src="source/plugin/orange_secret/static/js/magjs-x.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			var is_login = <!--{if $orange_conf['item_notlogin'] || $uid}-->true<!--{else}-->false<!--{/if}-->;
+			var is_xiaoyun = navigator.userAgent.indexOf('Appbyme')!=-1;
+			var is_magappx = navigator.userAgent.indexOf('MAGAPPX')!=-1;
+			var is_qianfan = navigator.userAgent.indexOf('QianFan')!=-1;
+			var siteurl = '{$siteurl}';
+			(function (){
+			    var Doc = document.documentElement;
+			    Doc.style.fontSize = Doc.clientWidth/10+'px';
+			})();
+			connectSQJavascriptBridge(function(){});
+		</script>
+	</head>
